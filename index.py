@@ -1,5 +1,5 @@
-import telebot
 from telebot import types
+import telebot
 import requests
 from datetime import datetime
 import uuid
@@ -8,6 +8,7 @@ import subprocess
 #Conexion con nuestro BOT
 TOKEN = '7183470855:AAGgo_eXb2POEsx6RjIRzCQI6bkwmvUOSFU'
 bot = telebot.TeleBot(TOKEN)
+
 PHOTOS_FOLDER = r"C:\Users\jrios\OneDrive\Escritorio\Detection-and-count-CBB\Broca2000\examp"
 ruta_bat = r'C:\Users\jrios\OneDrive\Escritorio\Bot_telegram\run_app.bat'
 TEXT_FOLDER = r'C:\Users\jrios\OneDrive\Escritorio\Detection-and-count-CBB\yolov5\runs\detect'
