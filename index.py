@@ -13,7 +13,8 @@ bot = telebot.TeleBot(TOKEN)
 
 PHOTOS_FOLDER = "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\data\\Broca2000\\images"
 ruta_bat = r"C:\\Users\\jrios\\Desktop\\bot_telegram\\run_app.bat"
-TEXT_FOLDER = r'C:\Users\jrios\OneDrive\Escritorio\Detection-and-count-CBB\yolov5\runs\detect'
+directoriotxt = "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp\\labels"
+directorio= "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp"
 
 def buscar_archivos(nombre_directorio, nombre_archivo):
     # Cambiar al directorio especificado
@@ -88,8 +89,7 @@ def save_photo(message):
          # Enviar el contenido del archivo de texto como mensaje
         bot.reply_to(message, "Se ha recibido con éxito, en un momento se le enviara los resultados")
         # Directorio en el que quieres buscar
-        directoriotxt = "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp\\labels"
-        directorio= "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp"
+       
         # Nombre del archivo que estás buscando (sin la extensión)
         nombre_archivo =  message.photo[-1].file_id
        
