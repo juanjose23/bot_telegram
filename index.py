@@ -5,14 +5,39 @@ from datetime import datetime
 import uuid
 import os
 import subprocess
+import glob
+import time
 #Conexion con nuestro BOT
 TOKEN = '7183470855:AAGgo_eXb2POEsx6RjIRzCQI6bkwmvUOSFU'
 bot = telebot.TeleBot(TOKEN)
 
-PHOTOS_FOLDER = r"C:\Users\jrios\OneDrive\Escritorio\Detection-and-count-CBB\Broca2000\examp"
-ruta_bat = r'C:\Users\jrios\OneDrive\Escritorio\Bot_telegram\run_app.bat'
+PHOTOS_FOLDER = "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\data\\Broca2000\\images"
+ruta_bat = r"C:\\Users\\jrios\\Desktop\\bot_telegram\\run_app.bat"
 TEXT_FOLDER = r'C:\Users\jrios\OneDrive\Escritorio\Detection-and-count-CBB\yolov5\runs\detect'
 
+def buscar_archivos(nombre_directorio, nombre_archivo):
+    # Cambiar al directorio especificado
+    os.chdir(nombre_directorio)
+    
+    # Buscar archivos con el nombre especificado
+    archivos_encontrados = glob.glob(nombre_archivo + ".*")
+    
+    # Devolver la lista de rutas absolutas de archivos encontrados
+    return archivos_encontrados
+def contartxt(nombre_directorio, nombre_archivo):
+    # Cambiar al directorio especificado
+    os.chdir(nombre_directorio)
+    
+    # Buscar archivos con el nombre especificado
+    archivos_encontrados = glob.glob(nombre_archivo + ".txt")
+    
+    # Contar las líneas del primer archivo encontrado
+    if archivos_encontrados:
+        with open(archivos_encontrados[0], 'r') as archivo:
+            lineas = sum(1 for linea in archivo)
+        return lineas
+    else:
+        return None, 0
 # Manejar el comando /start
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -53,6 +78,7 @@ def save_photo(message):
         # Descargar la imagen
         downloaded_file = bot.download_file(file_info.file_path)
         # Guardar la imagen en la carpeta especificada
+       
         file_path = os.path.join(PHOTOS_FOLDER, f"{message.photo[-1].file_id}.jpg")
         with open(file_path, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -60,9 +86,40 @@ def save_photo(message):
         subprocess.run(ruta_bat, shell=True)
 
          # Enviar el contenido del archivo de texto como mensaje
-        bot.reply_to(message, "Se ha recibido con éxito:")
-     
+        bot.reply_to(message, "Se ha recibido con éxito, en un momento se le enviara los resultados")
+        # Directorio en el que quieres buscar
+        directoriotxt = "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp\\labels"
+        directorio= "C:\\Users\\jrios\\Desktop\\Detection-and-count-CBB\\yolov5\\runs\\detect\\exp"
+        # Nombre del archivo que estás buscando (sin la extensión)
+        nombre_archivo =  message.photo[-1].file_id
+       
+        # Llamar a la función para buscar archivos
+        numeros = []
+        archivos_encontrados = []
+        enviado_mensaje = False
 
+        while not enviado_mensaje:
+            while not numeros:
+                numeros = contartxt(directoriotxt, nombre_archivo)
+                if not numeros:
+                    bot.reply_to(message, f"Esperando a que se encuentren insectos...")
+                    time.sleep(1)
+
+            while not archivos_encontrados:
+                archivos_encontrados = buscar_archivos(directorio, nombre_archivo)
+                if not archivos_encontrados:
+                    bot.reply_to(message, "Esperando a que se encuentren archivos...")
+                    time.sleep(1)
+
+            bot.reply_to(message, f"Se han encontrado {numeros} insectos.")
+            rutas_completas = f"{directorio}\\{archivos_encontrados[0]}"
+           # bot.reply_to(message, f"Se han encontrado {archivos_encontrados} insectos.")
+            bot.send_photo(chat_id=message.chat.id, photo=open(rutas_completas, 'rb'), caption='Aquí tienes tu imagen')
+          
+            enviado_mensaje = True
+
+                
+                
     except Exception as e:
         print(e)
         bot.reply_to(message, "¡Ha ocurrido un error al guardar o procesar la imagen.")
@@ -70,6 +127,7 @@ def save_photo(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_other(message):
+
     bot.reply_to(message, "Lo siento, no entendí ese comando. Por favor, usa el comando /start para comenzar.")
 
 
